@@ -6,7 +6,7 @@ const SECRET = process.env.JWT_SECRET || "supersecretkey";
 export async function middleware(req) {
   const token = req.cookies.get("accessToken")?.value;
 
-  console.log("dsfdsf",token)
+  
 
   if (!token) {
     return NextResponse.redirect(new URL("/login", req.url));
