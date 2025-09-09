@@ -142,6 +142,9 @@ const handleOtpLogin = async ({ mobile, otp }) => {
     localStorage.setItem("accessToken", data.accessToken);
     localStorage.setItem("refreshToken", data.refreshToken);
 
+    CookieStore.set("accessToken", data.accessToken)
+    CookieStore.set("refreshToken", data.refreshToken)
+
     toast.success("Login successful!");
     router.push(`/dashboard`);
   } catch (err) {

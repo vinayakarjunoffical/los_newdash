@@ -5,11 +5,11 @@ import AppHeader from "@/layout/AppHeader";
 import AppSidebar from "@/layout/AppSidebar";
 import Backdrop from "@/layout/Backdrop";
 import React from "react";
-import { useAuth } from "@/hooks/useAuth";
+
 
 export default function AdminLayout({ children }) {
   const { isExpanded, isHovered, isMobileOpen } = useSidebar();
-   useAuth();
+   
 
   // Dynamic class for main content margin based on sidebar state
   const mainContentMargin = isMobileOpen
