@@ -18,44 +18,107 @@ export async function POST(req) {
   const { email, mobile, password, otp, requestOtp } = await req.json();
 
   // Find user by email or mobile
-  const user = users.find(u => (email && u.email === email) || (mobile && u.mobile === mobile));
+  const user = users.find(
+    (u) => (email && u.email === email) || (mobile && u.mobile === mobile)
+  );
 
   if (!user) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
-  // Demo OTP request
   if (requestOtp) {
-    // In a real app, send SMS/email here
-    return NextResponse.json({ message: `OTP for ${mobile} is ${user.otp} (demo)` });
+    return NextResponse.json({
+      message: `OTP for ${mobile} is ${user.otp} (demo)`,
+    });
   }
 
-  // If neither password nor OTP provided
   if (!password && !otp) {
-    return NextResponse.json({ error: "Password or OTP required" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Password or OTP required" },
+      { status: 400 }
+    );
   }
 
-  // Login with password
   if (password && user.password !== password) {
     return NextResponse.json({ error: "Invalid password" }, { status: 401 });
   }
 
-  // Login with OTP
   if (otp && user.otp !== otp) {
     return NextResponse.json({ error: "Invalid OTP" }, { status: 401 });
   }
 
   // Generate tokens
-  const accessToken = jwt.sign({ id: user.id, role: user.role }, SECRET, { expiresIn: "15m" });
+  const accessToken = jwt.sign({ id: user.id, role: user.role }, SECRET, {
+    expiresIn: "15m",
+  });
   const refreshToken = jwt.sign({ id: user.id }, SECRET, { expiresIn: "7d" });
 
-  return NextResponse.json({
+  // ✅ Create response
+  const response = NextResponse.json({
     userId: user.id,
     role: user.role,
-    accessToken,
-    refreshToken,
+    message: "Login successful",
   });
+
+  // ✅ Attach cookies
+  response.cookies.set("accessToken", accessToken, {
+    httpOnly: true,
+    secure: true, // important on Vercel (HTTPS)
+    sameSite: "lax", // or "strict"
+    path: "/",
+    maxAge: 60 * 15, // 15 minutes
+  });
+
+  response.cookies.set("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 7, // 7 days
+  });
+
+  return response;
 }
+
+
+//***************************add code******************************** */
+// export async function POST(req) {
+//   const { email, mobile, password, otp, requestOtp } = await req.json();
+
+//   const user = users.find(u => (email && u.email === email) || (mobile && u.mobile === mobile));
+
+//   if (!user) {
+//     return NextResponse.json({ error: "User not found" }, { status: 404 });
+//   }
+
+//   if (requestOtp) {
+
+//     return NextResponse.json({ message: `OTP for ${mobile} is ${user.otp} (demo)` });
+//   }
+
+
+//   if (!password && !otp) {
+//     return NextResponse.json({ error: "Password or OTP required" }, { status: 400 });
+//   }
+
+//   if (password && user.password !== password) {
+//     return NextResponse.json({ error: "Invalid password" }, { status: 401 });
+//   }
+
+//   if (otp && user.otp !== otp) {
+//     return NextResponse.json({ error: "Invalid OTP" }, { status: 401 });
+//   }
+
+//   const accessToken = jwt.sign({ id: user.id, role: user.role }, SECRET, { expiresIn: "15m" });
+//   const refreshToken = jwt.sign({ id: user.id }, SECRET, { expiresIn: "7d" });
+
+//   return NextResponse.json({
+//     userId: user.id,
+//     role: user.role,
+//     accessToken,
+//     refreshToken,
+//   });
+// }
 
 
 //******************************8-09-25 1.25****************************** */
