@@ -148,7 +148,7 @@ const handleOtpLogin = async ({ mobile, otp }) => {
     toast.success("Login successful!");
     router.push(`/dashboard`);
   } catch (err) {
-    toast.error("Something went wrong");
+    toast.error("Something went wrong2");
   }
 };
 
