@@ -37,7 +37,7 @@ const Dashboard = () => {
     const router = useRouter();
   useEffect(() => {
     const userId = localStorage.getItem("userId");
-    // if (!userId) router.replace("/login");
+    if (!userId) router.replace("/login");
     console.log("adadsd",userId)
   }, [router]);
   return (

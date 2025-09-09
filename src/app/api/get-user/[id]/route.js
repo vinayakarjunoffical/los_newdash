@@ -2,7 +2,8 @@ const users = [
   { id: 1, email: "admin@test.com", mobile: "9999000001", password: "123456", otp: "111111", role: "admin" },
   { id: 2, email: "verification@test.com", mobile: "9999000002", password: "123456", otp: "222222", role: "verification" },
   { id: 3, email: "fi@test.com", mobile: "9999000003", password: "123456", otp: "333333", role: "fi" },
-  { id: 4, email: "risk_ssessment@test.com", mobile: "9999000004", password: "123456", otp: "444444", role: "risk_ssessment" },
+  { id: 4, email: "credit@test.com", mobile: "9999000004", password: "123456", otp: "444444", role: "credit" },
+   { id: 5, email: "risk_ssessment@test.com", mobile: "9999000004", password: "123456", otp: "444444", role: "risk_ssessment" },
 ];
 
 export async function GET(req, { params }) {
