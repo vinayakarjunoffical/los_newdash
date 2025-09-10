@@ -413,7 +413,7 @@ const Questions = () => {
 
           <Button
             type="submit"
-            className="lg:w-[250px] flex items-center gap-2 text-lg rounded-2xl"
+            className="lg:w-[250px] flex items-center gap-2 rounded-2xl"
           >
             <Send className="w-5 h-5" />
             Submit Questionnaire

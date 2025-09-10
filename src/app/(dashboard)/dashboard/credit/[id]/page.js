@@ -1006,8 +1006,8 @@ const approvalProbability = useMemo(() => {
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Type</TableHead> 
                           <TableHead>Organization</TableHead>
+                          <TableHead>Type</TableHead> 
                           <TableHead>Limit</TableHead>
                           <TableHead>Balance</TableHead>
                           <TableHead>Status</TableHead>
@@ -1018,14 +1018,15 @@ const approvalProbability = useMemo(() => {
                       <TableBody>
                         {applicant.bureau.activeLines.map((l, i) => (
                           <TableRow key={i}>
-                            <TableCell
+                           
+                            <TableCell>
+                              {l.organization ? currency(l.organization) : "—"}
+                            </TableCell>
+                             <TableCell
                               className="text-blue-600 cursor-pointer hover:underline"
                               onClick={() => handleOpen(l)}
                             >
                               {l.type}
-                            </TableCell>
-                            <TableCell>
-                              {l.organization ? currency(l.organization) : "—"}
                             </TableCell>
                             <TableCell>
                               {l.limit ? currency(l.limit) : "—"}

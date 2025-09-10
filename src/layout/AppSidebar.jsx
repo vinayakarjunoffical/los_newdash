@@ -15,16 +15,19 @@ import {
   FileSearch,
   ChevronDown,
   MoreHorizontal,
+  ClipboardCheck,
 } from "lucide-react";
 
 const navItems = [
   { icon: <LayoutDashboard className="w-5 h-5" />, name: "Dashboard", path: "/dashboard" },
   { icon: <AppWindow className="w-5 h-5" />, name: "Applications", path: "/dashboard/applicationid" },
   { icon: <ClipboardList className="w-5 h-5" />, name: "Questionnaire", path: "/dashboard/q&a" },
-  { icon: <ShieldCheck className="w-5 h-5" />, name: "Risk Assessment", path: "/dashboard/riskassessment" },
+  // { icon: <ShieldCheck className="w-5 h-5" />, name: "Risk Assessment", path: "/dashboard/riskassessment" },
   { icon: <MapPin className="w-5 h-5" />, name: "FI", path: "/dashboard/field_investigation" },
   { icon: <CreditCard className="w-5 h-5" />, name: "Credit", path: "/dashboard/credit" },
+    { icon: <ClipboardCheck className="w-5 h-5" />, name: "PDI", path: "/dashboard/pdi" },
   { icon: <FileSearch className="w-5 h-5" />, name: "Audit Log", path: "/dashboard/audit" },
+
 ];
 
 const AppSidebar = () => {
@@ -131,7 +134,7 @@ const AppSidebar = () => {
                 className="dark:hidden"
               />
               <Image
-                src="/assets/images/logo-dark.png"
+                src="/assets/images/logo.png"
                 alt="Logo Dark"
                 width={150}
                 height={40}
