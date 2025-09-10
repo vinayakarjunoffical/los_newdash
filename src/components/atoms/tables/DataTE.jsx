@@ -12,17 +12,28 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
+import { Plus } from "lucide-react"; 
 
 export default function DataTE({
   columns,
   data,
   itemsPerPage = 5,
-  actionBasePath = "", 
-  actionParams = ["id"], 
+  actionBasePath = "",
+  actionParams = ["id"],
+  showAddButton = false, 
 }) {
   const router = useRouter();
 
+  const [tableData, setTableData] = React.useState(data);
   const [currentPage, setCurrentPage] = React.useState(1);
   const [searchTerm, setSearchTerm] = React.useState("");
   const [sortConfig, setSortConfig] = React.useState({
@@ -30,22 +41,22 @@ export default function DataTE({
     direction: "asc",
   });
 
-  // const buildUrl = (item) => {
-  //   return `${actionBasePath}/${actionParams.map((key) => item[key]).join("/")}`;
-  // };
+  // 🔹 Add Modal State
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+  const [formData, setFormData] = React.useState({});
 
+  // 🔹 Build URL
   const buildUrl = (item) => {
-  const id = item[actionParams[0]];
-  const queryString = actionParams
-    .slice(1)
-    .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(item[key])}`)
-    .join("&");
+    const id = item[actionParams[0]];
+    const queryString = actionParams
+      .slice(1)
+      .map(
+        (key) => `${encodeURIComponent(key)}=${encodeURIComponent(item[key])}`
+      )
+      .join("&");
 
-  return `${actionBasePath}/${id}${queryString ? `?${queryString}` : ""}`;
-};
-
-
-
+    return `${actionBasePath}/${id}${queryString ? `?${queryString}` : ""}`;
+  };
 
   // 🔹 Sorting
   const handleSort = (key) => {
@@ -58,7 +69,7 @@ export default function DataTE({
 
   // 🔹 Filter + Sort
   const filteredData = React.useMemo(() => {
-    let filtered = data.filter((item) =>
+    let filtered = tableData.filter((item) =>
       Object.values(item)
         .join(" ")
         .toLowerCase()
@@ -77,7 +88,7 @@ export default function DataTE({
       });
     }
     return filtered;
-  }, [data, searchTerm, sortConfig]);
+  }, [tableData, searchTerm, sortConfig]);
 
   // 🔹 Pagination
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -85,9 +96,29 @@ export default function DataTE({
   const currentData = filteredData.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
+  // 🔹 Handle Add
+  const handleAddClick = () => {
+    // reset form with empty values
+    const emptyForm = {};
+    columns.forEach((col) => {
+      emptyForm[col.key] = "";
+    });
+    setFormData(emptyForm);
+    setIsDialogOpen(true);
+  };
+
+  const handleFormChange = (e, key) => {
+    setFormData({ ...formData, [key]: e.target.value });
+  };
+
+  const handleFormSubmit = () => {
+    setTableData([...tableData, { ...formData }]);
+    setIsDialogOpen(false);
+  };
+
   return (
-    <div className="min-w-full px-5 py-3 ">
-      {/* 🔍 Search */}
+    <div className="min-w-full px-5 py-3">
+      {/* 🔍 Search + Add Button */}
       <div className="flex items-center justify-between mb-4">
         <Input
           placeholder="Search..."
@@ -99,9 +130,15 @@ export default function DataTE({
           className="w-1/3"
         />
 
+        {showAddButton && (
+          <Button onClick={handleAddClick} className="flex items-center gap-2">
+            <Plus className="w-4 h-4" /> Add
+          </Button>
+        )}
       </div>
 
-      <div className=" max-w-full border rounded-lg px-5 py-2 overflow-x-auto scroll-smooth">
+      {/* 🔹 Table */}
+      <div className="max-w-full border rounded-lg px-5 py-2 overflow-x-auto scroll-smooth">
         <Table className="min-w-full table-auto">
           <TableHeader>
             <TableRow>
@@ -152,7 +189,7 @@ export default function DataTE({
                     <Button
                       variant="outline"
                       size="sm"
-                     onClick={() => router.push(buildUrl(item))}
+                      onClick={() => router.push(buildUrl(item))}
                     >
                       View
                     </Button>
@@ -194,9 +231,239 @@ export default function DataTE({
           </Button>
         </div>
       </div>
+
+      {/* 🔹 Add Modal */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Add New Entry</DialogTitle>
+          </DialogHeader>
+
+          <div className="grid grid-cols-1 gap-4 mt-4">
+            {columns.map((col) => (
+              <div key={col.key} className="flex flex-col space-y-2">
+                <Label htmlFor={col.key}>{col.label}</Label>
+                <Input
+                  id={col.key}
+                  value={formData[col.key] || ""}
+                  onChange={(e) => handleFormChange(e, col.key)}
+                />
+              </div>
+            ))}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleFormSubmit}>Submit</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
+//******************************************10-09-25 5:54 without add button*********************************** */
+
+// "use client";
+
+// import * as React from "react";
+// import {
+//   Table,
+//   TableBody,
+//   TableHead,
+//   TableHeader,
+//   TableRow,
+//   TableCell,
+// } from "@/components/ui/table";
+// import { Checkbox } from "@/components/ui/checkbox";
+// import { Input } from "@/components/ui/input";
+// import { Button } from "@/components/ui/button";
+// import { useRouter } from "next/navigation";
+
+// export default function DataTE({
+//   columns,
+//   data,
+//   itemsPerPage = 5,
+//   actionBasePath = "", 
+//   actionParams = ["id"], 
+// }) {
+//   const router = useRouter();
+
+//   const [currentPage, setCurrentPage] = React.useState(1);
+//   const [searchTerm, setSearchTerm] = React.useState("");
+//   const [sortConfig, setSortConfig] = React.useState({
+//     key: null,
+//     direction: "asc",
+//   });
+
+//   // const buildUrl = (item) => {
+//   //   return `${actionBasePath}/${actionParams.map((key) => item[key]).join("/")}`;
+//   // };
+
+//   const buildUrl = (item) => {
+//   const id = item[actionParams[0]];
+//   const queryString = actionParams
+//     .slice(1)
+//     .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(item[key])}`)
+//     .join("&");
+
+//   return `${actionBasePath}/${id}${queryString ? `?${queryString}` : ""}`;
+// };
+
+
+
+
+//   // 🔹 Sorting
+//   const handleSort = (key) => {
+//     let direction = "asc";
+//     if (sortConfig.key === key && sortConfig.direction === "asc") {
+//       direction = "desc";
+//     }
+//     setSortConfig({ key, direction });
+//   };
+
+//   // 🔹 Filter + Sort
+//   const filteredData = React.useMemo(() => {
+//     let filtered = data.filter((item) =>
+//       Object.values(item)
+//         .join(" ")
+//         .toLowerCase()
+//         .includes(searchTerm.toLowerCase())
+//     );
+
+//     if (sortConfig.key) {
+//       filtered = [...filtered].sort((a, b) => {
+//         if (a[sortConfig.key] < b[sortConfig.key]) {
+//           return sortConfig.direction === "asc" ? -1 : 1;
+//         }
+//         if (a[sortConfig.key] > b[sortConfig.key]) {
+//           return sortConfig.direction === "asc" ? 1 : -1;
+//         }
+//         return 0;
+//       });
+//     }
+//     return filtered;
+//   }, [data, searchTerm, sortConfig]);
+
+//   // 🔹 Pagination
+//   const indexOfLastItem = currentPage * itemsPerPage;
+//   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+//   const currentData = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+//   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
+//   return (
+//     <div className="min-w-full px-5 py-3 ">
+//       {/* 🔍 Search */}
+//       <div className="flex items-center justify-between mb-4">
+//         <Input
+//           placeholder="Search..."
+//           value={searchTerm}
+//           onChange={(e) => {
+//             setSearchTerm(e.target.value);
+//             setCurrentPage(1);
+//           }}
+//           className="w-1/3"
+//         />
+
+//       </div>
+
+//       <div className=" max-w-full border rounded-lg px-5 py-2 overflow-x-auto scroll-smooth">
+//         <Table className="min-w-full table-auto">
+//           <TableHeader>
+//             <TableRow>
+//               <TableHead key="checkbox" className="w-12">
+//                 <Checkbox />
+//               </TableHead>
+//               {columns.map((col, colIndex) => (
+//                 <TableHead
+//                   key={`head-${colIndex}`}
+//                   className={`${
+//                     col.sortable ? "cursor-pointer" : ""
+//                   } dark:text-gray-200 whitespace-nowrap`}
+//                   onClick={() => col.sortable && handleSort(col.key)}
+//                 >
+//                   {col.label}
+//                   {sortConfig.key === col.key &&
+//                     (sortConfig.direction === "asc" ? " 🔼" : " 🔽")}
+//                 </TableHead>
+//               ))}
+//               <TableHead key="action" className="whitespace-nowrap">
+//                 Action
+//               </TableHead>
+//             </TableRow>
+//           </TableHeader>
+
+//           <TableBody>
+//             {currentData.length > 0 ? (
+//               currentData.map((item, rowIndex) => (
+//                 <TableRow key={`row-${rowIndex}`}>
+//                   <TableCell key={`check-${rowIndex}`}>
+//                     <Checkbox />
+//                   </TableCell>
+
+//                   {columns.map((col, colIndex) => (
+//                     <TableCell
+//                       key={`cell-${rowIndex}-${colIndex}`}
+//                       className="whitespace-nowrap dark:text-gray-200"
+//                     >
+//                       {col.render ? col.render(item) : item[col.key]}
+//                     </TableCell>
+//                   ))}
+
+//                   {/* 🔹 Action Button */}
+//                   <TableCell
+//                     key={`action-${rowIndex}`}
+//                     className="whitespace-nowrap"
+//                   >
+//                     <Button
+//                       variant="outline"
+//                       size="sm"
+//                      onClick={() => router.push(buildUrl(item))}
+//                     >
+//                       View
+//                     </Button>
+//                   </TableCell>
+//                 </TableRow>
+//               ))
+//             ) : (
+//               <TableRow>
+//                 <TableCell colSpan={columns.length + 2} className="text-center">
+//                   No data found
+//                 </TableCell>
+//               </TableRow>
+//             )}
+//           </TableBody>
+//         </Table>
+//       </div>
+
+//       {/* 📄 Pagination */}
+//       <div className="flex justify-between items-center mt-4">
+//         <span>
+//           Page {currentPage} of {totalPages || 1}
+//         </span>
+//         <div className="space-x-2">
+//           <Button
+//             variant="outline"
+//             size="sm"
+//             disabled={currentPage === 1}
+//             onClick={() => setCurrentPage((p) => p - 1)}
+//           >
+//             Previous
+//           </Button>
+//           <Button
+//             variant="outline"
+//             size="sm"
+//             disabled={currentPage === totalPages || totalPages === 0}
+//             onClick={() => setCurrentPage((p) => p + 1)}
+//           >
+//             Next
+//           </Button>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
 
 //*************************************add the new data 01.38******************************************** */
 // "use client";

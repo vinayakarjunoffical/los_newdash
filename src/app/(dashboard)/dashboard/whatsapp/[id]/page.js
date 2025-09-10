@@ -21,8 +21,7 @@ export default function Page() {
       onBack={() => router.back()}  title="Pre-Disbursement Inspection" subtitle="Reviewing financial and personal details prior to loan release"  />
       <div className="space-y-6">
         <ComponentCard title="Application data">
-           {/* <WhatsAppIntegration  /> */}
-           <IntegrationTable />
+           <WhatsAppIntegration  />
         </ComponentCard>
       </div>
     </div>
