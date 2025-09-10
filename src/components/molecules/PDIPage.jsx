@@ -48,6 +48,9 @@ export default function PDIPage() {
   const handleExport = () => {
     toast.info("Export functionality coming soon...");
   };
+   const handleImport = () => {
+    toast.info("Import functionality coming soon...");
+  };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 max-w-6xl mx-auto">
@@ -59,7 +62,7 @@ export default function PDIPage() {
             <Download className="w-4 h-4 mr-2" />
             Export
           </Button>
-          <Button variant="outline">
+          <Button onClick={handleImport}  variant="outline">
             <Upload className="w-4 h-4 mr-2" />
             Import
           </Button>

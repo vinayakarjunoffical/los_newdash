@@ -24,6 +24,7 @@ const navItems = [
   { icon: <ClipboardList className="w-5 h-5" />, name: "Questionnaire", path: "/dashboard/q&a" },
   // { icon: <ShieldCheck className="w-5 h-5" />, name: "Risk Assessment", path: "/dashboard/riskassessment" },
   { icon: <MapPin className="w-5 h-5" />, name: "FI", path: "/dashboard/field_investigation" },
+   { icon: <MapPin className="w-5 h-5" />, name: "Integration", path: "/dashboard/whatsapp" },
   { icon: <CreditCard className="w-5 h-5" />, name: "Credit", path: "/dashboard/credit" },
     { icon: <ClipboardCheck className="w-5 h-5" />, name: "PDI", path: "/dashboard/pdi" },
   { icon: <FileSearch className="w-5 h-5" />, name: "Audit Log", path: "/dashboard/audit" },
