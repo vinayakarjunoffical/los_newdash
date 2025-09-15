@@ -37,6 +37,11 @@ const PRODUCTS = ["Home Loan", "Bike Loan", "Car Loan", "Personal Loan"]
 // -------------------- DataTable Columns --------------------
 const getColumns = (onEdit, onDelete) => [
   {
+    id: "serial",
+    header: "S.No.",
+    cell: ({ row }) => row.index + 1, // show index + 1
+  },
+  {
     accessorKey: "text",
     header: "Question",
   },
@@ -446,7 +451,7 @@ const Questions = () => {
           {editingQuestion && (
             <div className="space-y-6">
               <div>
-                <Label>Question</Label>
+                <Label className="pb-2">Question</Label>
                 <Input
                   value={editingQuestion.text}
                   onChange={(e) =>
@@ -472,7 +477,7 @@ const Questions = () => {
               </div>
 
               <div>
-                <Label>Answer Length</Label>
+                <Label className="pb-2">Answer Length</Label>
                 <Input
                   type="number"
                   value={editingQuestion.length}
@@ -609,7 +614,7 @@ const Questions = () => {
               </div>
 
               <div>
-                <Label>Supported Document</Label>
+                <Label className="pb-2">Supported Document</Label>
                 <Input
                   value={editingQuestion.documents}
                   onChange={(e) =>

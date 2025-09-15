@@ -1,0 +1,36 @@
+[
+  {
+    "id": 1,
+    "name": "Super Admin A",
+    "role": "superadmin",
+    "permissions": [
+      "dashboard:view",
+      "reports:view",
+      "reports:export",
+      "table_a:view", "table_a:create", "table_a:edit", "table_a:delete", "table_a:assign_owner",
+      "table_b:view", "table_b:create", "table_b:edit", "table_b:delete", "table_b:assign_owner",
+      "table_c:view", "table_c:create", "table_c:edit", "table_c:delete", "table_c:assign_owner"
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Admin A",
+    "role": "admin",
+    "permissions": [
+      "dashboard:view",
+      "reports:view",
+      "table_a:view", "table_a:create", "table_a:edit", "table_a:delete",
+      "table_b:view", "table_b:create", "table_b:edit"
+    ]
+  },
+  {
+    "id": 3,
+    "name": "User A",
+    "role": "user",
+    "permissions": [
+      "dashboard:view",
+      "table_a:view",
+      "table_b:view"
+    ]
+  }
+]

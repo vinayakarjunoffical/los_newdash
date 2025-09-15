@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -9,26 +9,30 @@ import {
   LayoutDashboard,
   AppWindow,
   ClipboardList,
-  ShieldCheck,
   MapPin,
   CreditCard,
   FileSearch,
   ChevronDown,
-  MoreHorizontal,
   ClipboardCheck,
 } from "lucide-react";
 
 const navItems = [
   { icon: <LayoutDashboard className="w-5 h-5" />, name: "Dashboard", path: "/dashboard" },
-  { icon: <AppWindow className="w-5 h-5" />, name: "Applications", path: "/dashboard/applicationid" },
+  { 
+    icon: <AppWindow className="w-5 h-5" />, 
+    name: "Department & Roles", 
+    subItems: [
+      { name: "Department", path: "/dashboard/department&role/department" },
+      { name: "Roles", path: "/dashboard/department&role/roles" },
+    ], 
+  },
+  { icon: <MapPin className="w-5 h-5" />, name: "Integration", path: "/dashboard/whatsapp" },
   { icon: <ClipboardList className="w-5 h-5" />, name: "Questionnaire", path: "/dashboard/q&a" },
-  // { icon: <ShieldCheck className="w-5 h-5" />, name: "Risk Assessment", path: "/dashboard/riskassessment" },
+  { icon: <AppWindow className="w-5 h-5" />, name: "Applications", path: "/dashboard/applicationid" },
   { icon: <MapPin className="w-5 h-5" />, name: "FI", path: "/dashboard/field_investigation" },
-   { icon: <MapPin className="w-5 h-5" />, name: "Integration", path: "/dashboard/whatsapp" },
   { icon: <CreditCard className="w-5 h-5" />, name: "Credit", path: "/dashboard/credit" },
-    { icon: <ClipboardCheck className="w-5 h-5" />, name: "PDI", path: "/dashboard/pdi" },
+  { icon: <ClipboardCheck className="w-5 h-5" />, name: "PDI", path: "/dashboard/pdi" },
   { icon: <FileSearch className="w-5 h-5" />, name: "Audit Log", path: "/dashboard/audit" },
-
 ];
 
 const AppSidebar = () => {
@@ -36,18 +40,12 @@ const AppSidebar = () => {
   const pathname = usePathname();
 
   const [openSubmenu, setOpenSubmenu] = useState(null);
-  const [subMenuHeight, setSubMenuHeight] = useState({});
-  const subMenuRefs = useRef({});
   const [role, setRole] = useState(null);
 
-  const isActive = useCallback((path) => path === pathname, [pathname]);
+  const isActive = useCallback((path) => pathname === path, [pathname]);
 
-  const handleSubmenuToggle = (index, menuType) => {
-    setOpenSubmenu((prev) =>
-      prev && prev.type === menuType && prev.index === index
-        ? null
-        : { type: menuType, index }
-    );
+  const handleSubmenuToggle = (index) => {
+    setOpenSubmenu((prev) => (prev === index ? null : index));
   };
 
   useEffect(() => {
@@ -55,51 +53,69 @@ const AppSidebar = () => {
     setRole(storedRole);
   }, []);
 
-  useEffect(() => {
-    if (openSubmenu !== null) {
-      const key = `${openSubmenu.type}-${openSubmenu.index}`;
-      if (subMenuRefs.current[key]) {
-        setSubMenuHeight((prev) => ({
-          ...prev,
-          [key]: subMenuRefs.current[key]?.scrollHeight || 0,
-        }));
-      }
-    }
-  }, [openSubmenu]);
-
-  // ✅ Permission check
   const hasAccess = (path) => {
     if (!role) return false;
     const allowed = rolePermissions[role] || [];
     return allowed.includes("*") || allowed.includes(path);
   };
 
-  // ✅ Filter menu based on role
-  const filteredNavItems = navItems.filter(
-    (item) => !item.path || hasAccess(item.path)
-  );
+  const filteredNavItems = navItems.filter((item) => !item.path || hasAccess(item.path));
 
-  // Menu item classes with dark mode
   const getMenuItemClass = (active) =>
-    `flex items-center gap-3 px-3 py-2 rounded-lg transition-colors group
+    `flex items-center gap-3 px-3 py-2 rounded-lg transition-colors w-full
      ${active 
        ? "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white"
        : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"}`;
 
-  const renderMenuItems = (items, menuType) => (
-    <ul className="flex flex-col gap-2">
+  const renderMenuItems = (items) => (
+    <ul className="flex flex-col gap-1">
       {items.map((nav, index) => (
         <li key={nav.name}>
-          {nav.path && (
+          {nav.subItems ? (
+            // Full row clickable for submenu
+            <button
+              onClick={() => handleSubmenuToggle(index)}
+              className={getMenuItemClass(openSubmenu === index || isActive(nav.path))}
+            >
+              <div className="flex items-center gap-3 flex-1">
+                {nav.icon}
+                {(isExpanded || isHovered || isMobileOpen) && (
+                  <span className="text-left">{nav.name}</span>
+                )}
+              </div>
+              {(isExpanded || isHovered || isMobileOpen) && (
+                <ChevronDown
+                  className={`w-4 h-4 transition-transform ${
+                    openSubmenu === index ? "rotate-180" : ""
+                  }`}
+                />
+              )}
+            </button>
+          ) : (
             <Link
               href={nav.path}
               className={getMenuItemClass(isActive(nav.path))}
             >
-              <span>{nav.icon}</span>
+              {nav.icon}
               {(isExpanded || isHovered || isMobileOpen) && (
-                <span className="menu-item-text">{nav.name}</span>
+                <span className="flex-1 text-left">{nav.name}</span>
               )}
             </Link>
+          )}
+
+          {nav.subItems && openSubmenu === index && (
+            <ul className="ml-6 mt-1 flex flex-col gap-1">
+              {nav.subItems.map((sub) => (
+                <li key={sub.name}>
+                  <Link
+                    href={sub.path}
+                    className={getMenuItemClass(isActive(sub.path))}
+                  >
+                    {sub.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           )}
         </li>
       ))}
@@ -112,7 +128,7 @@ const AppSidebar = () => {
         bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
         border-r border-gray-200 dark:border-gray-800
         h-screen transition-all duration-300 ease-in-out z-50
-        ${isExpanded || isMobileOpen ? "w-[290px]" : isHovered ? "w-[290px]" : "w-[90px]"}
+        ${isExpanded || isMobileOpen ? "w-[290px]" : isHovered ? "w-[90px]" : "w-[90px]"}
         ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
         lg:translate-x-0`}
       onMouseEnter={() => !isExpanded && setIsHovered(true)}
@@ -126,55 +142,204 @@ const AppSidebar = () => {
       >
         <Link href="/">
           {isExpanded || isHovered || isMobileOpen ? (
-            <>
-              <Image
-                src="/assets/images/logo.png"
-                alt="Logo"
-                width={150}
-                height={40}
-                className="dark:hidden"
-              />
-              <Image
-                src="/assets/images/logo.png"
-                alt="Logo Dark"
-                width={150}
-                height={40}
-                className="hidden dark:block"
-              />
-            </>
+            <Image src="/assets/images/logo.png" alt="Logo" width={150} height={40} />
           ) : (
-            <Image
-              src="/assets/images/logo-icon.png"
-              alt="Logo Icon"
-              width={32}
-              height={32}
-            />
+            <Image src="/assets/images/logo-icon.png" alt="Logo Icon" width={32} height={32} />
           )}
         </Link>
       </div>
 
       {/* Menu */}
-      <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
-        <nav className="mb-6">
-          <div className="flex flex-col gap-4">
-            <div>
-              <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] 
-                  text-gray-400 dark:text-gray-500
-                  ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-start"}`}
-              >
-                {isExpanded || isHovered || isMobileOpen ? "Menu" : <MoreHorizontal />}
-              </h2>
-              {renderMenuItems(filteredNavItems, "main")}
-            </div>
-          </div>
-        </nav>
-      </div>
+      <nav className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
+        {renderMenuItems(filteredNavItems)}
+      </nav>
     </aside>
   );
 };
 
 export default AppSidebar;
+
+
+
+//***************************************working code******************************************* */
+// "use client";
+// import React, { useEffect, useRef, useState, useCallback } from "react";
+// import Link from "next/link";
+// import Image from "next/image";
+// import { usePathname } from "next/navigation";
+// import { useSidebar } from "../context/SidebarContext";
+// import { rolePermissions } from "@/utils/access/rolePermissions";
+// import {
+//   LayoutDashboard,
+//   AppWindow,
+//   ClipboardList,
+//   ShieldCheck,
+//   MapPin,
+//   CreditCard,
+//   FileSearch,
+//   ChevronDown,
+//   MoreHorizontal,
+//   ClipboardCheck,
+// } from "lucide-react";
+
+// const navItems = [
+//   { icon: <LayoutDashboard className="w-5 h-5" />, name: "Dashboard", path: "/dashboard" },
+//   { icon: <AppWindow className="w-5 h-5" />, name: "Department", path: "/dashboard/department&role/roles"  },
+//   { icon: <AppWindow className="w-5 h-5" />, name: "Applications", path: "/dashboard/applicationid" },
+//   { icon: <ClipboardList className="w-5 h-5" />, name: "Questionnaire", path: "/dashboard/q&a" },
+//   // { icon: <ShieldCheck className="w-5 h-5" />, name: "Risk Assessment", path: "/dashboard/riskassessment" },
+//   { icon: <MapPin className="w-5 h-5" />, name: "FI", path: "/dashboard/field_investigation" },
+//    { icon: <MapPin className="w-5 h-5" />, name: "Integration", path: "/dashboard/whatsapp" },
+//   { icon: <CreditCard className="w-5 h-5" />, name: "Credit", path: "/dashboard/credit" },
+//     { icon: <ClipboardCheck className="w-5 h-5" />, name: "PDI", path: "/dashboard/pdi" },
+//   { icon: <FileSearch className="w-5 h-5" />, name: "Audit Log", path: "/dashboard/audit" },
+
+// ];
+
+// const AppSidebar = () => {
+//   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
+//   const pathname = usePathname();
+
+//   const [openSubmenu, setOpenSubmenu] = useState(null);
+//   const [subMenuHeight, setSubMenuHeight] = useState({});
+//   const subMenuRefs = useRef({});
+//   const [role, setRole] = useState(null);
+
+//   const isActive = useCallback((path) => path === pathname, [pathname]);
+
+//   const handleSubmenuToggle = (index, menuType) => {
+//     setOpenSubmenu((prev) =>
+//       prev && prev.type === menuType && prev.index === index
+//         ? null
+//         : { type: menuType, index }
+//     );
+//   };
+
+//   useEffect(() => {
+//     const storedRole = localStorage.getItem("role");
+//     setRole(storedRole);
+//   }, []);
+
+//   useEffect(() => {
+//     if (openSubmenu !== null) {
+//       const key = `${openSubmenu.type}-${openSubmenu.index}`;
+//       if (subMenuRefs.current[key]) {
+//         setSubMenuHeight((prev) => ({
+//           ...prev,
+//           [key]: subMenuRefs.current[key]?.scrollHeight || 0,
+//         }));
+//       }
+//     }
+//   }, [openSubmenu]);
+
+//   // ✅ Permission check
+//   const hasAccess = (path) => {
+//     if (!role) return false;
+//     const allowed = rolePermissions[role] || [];
+//     return allowed.includes("*") || allowed.includes(path);
+//   };
+
+//   // ✅ Filter menu based on role
+//   const filteredNavItems = navItems.filter(
+//     (item) => !item.path || hasAccess(item.path)
+//   );
+
+//   // Menu item classes with dark mode
+//   const getMenuItemClass = (active) =>
+//     `flex items-center gap-3 px-3 py-2 rounded-lg transition-colors group
+//      ${active 
+//        ? "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white"
+//        : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"}`;
+
+//   const renderMenuItems = (items, menuType) => (
+//     <ul className="flex flex-col gap-2">
+//       {items.map((nav, index) => (
+//         <li key={nav.name}>
+//           {nav.path && (
+//             <Link
+//               href={nav.path}
+//               className={getMenuItemClass(isActive(nav.path))}
+//             >
+//               <span>{nav.icon}</span>
+//               {(isExpanded || isHovered || isMobileOpen) && (
+//                 <span className="menu-item-text">{nav.name}</span>
+//               )}
+//             </Link>
+//           )}
+//         </li>
+//       ))}
+//     </ul>
+//   );
+
+//   return (
+//     <aside
+//       className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 
+//         bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+//         border-r border-gray-200 dark:border-gray-800
+//         h-screen transition-all duration-300 ease-in-out z-50
+//         ${isExpanded || isMobileOpen ? "w-[290px]" : isHovered ? "w-[290px]" : "w-[90px]"}
+//         ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
+//         lg:translate-x-0`}
+//       onMouseEnter={() => !isExpanded && setIsHovered(true)}
+//       onMouseLeave={() => setIsHovered(false)}
+//     >
+//       {/* Logo */}
+//       <div
+//         className={`py-8 flex ${
+//           !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
+//         }`}
+//       >
+//         <Link href="/">
+//           {isExpanded || isHovered || isMobileOpen ? (
+//             <>
+//               <Image
+//                 src="/assets/images/logo.png"
+//                 alt="Logo"
+//                 width={150}
+//                 height={40}
+//                 className="dark:hidden"
+//               />
+//               <Image
+//                 src="/assets/images/logo.png"
+//                 alt="Logo Dark"
+//                 width={150}
+//                 height={40}
+//                 className="hidden dark:block"
+//               />
+//             </>
+//           ) : (
+//             <Image
+//               src="/assets/images/logo-icon.png"
+//               alt="Logo Icon"
+//               width={32}
+//               height={32}
+//             />
+//           )}
+//         </Link>
+//       </div>
+
+//       {/* Menu */}
+//       <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
+//         <nav className="mb-6">
+//           <div className="flex flex-col gap-4">
+//             <div>
+//               <h2
+//                 className={`mb-4 text-xs uppercase flex leading-[20px] 
+//                   text-gray-400 dark:text-gray-500
+//                   ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-start"}`}
+//               >
+//                 {isExpanded || isHovered || isMobileOpen ? "Menu" : <MoreHorizontal />}
+//               </h2>
+//               {renderMenuItems(filteredNavItems, "main")}
+//             </div>
+//           </div>
+//         </nav>
+//       </div>
+//     </aside>
+//   );
+// };
+
+// export default AppSidebar;
 
 
 

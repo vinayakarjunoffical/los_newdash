@@ -5,8 +5,8 @@ import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import React from "react";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import DataTE from "@/components/atoms/tables/DataTE";
 import { pdiData } from "@/utils/Pdidata";
+import PDIPage from "@/components/molecules/PDIPage";
 
 export default function Page() {
     const router = useRouter();
@@ -14,31 +14,14 @@ export default function Page() {
         const userId = localStorage.getItem("userId");
         if (!userId) router.replace("/login");
       }, [router]);
-      const columns = [
-    { key: "id", label: "ID", sortable: true },
-    { key: "applicationId", label: "Application ID", sortable: true },
-    { key: "name", label: "Customer Name", sortable: true },
-    { key: "userType", label: "User Type", sortable: true },
-    { key: "email", label: "Email", sortable: true },
-    { key: "phone", label: "Phone Number", sortable: true },
-    { key: "address", label: "Address", sortable: true },
-  ];
+     
   return (
     <div>
       <PageBreadcrumb showBackButton
       onBack={() => router.back()}  title="Pre-Disbursement Inspection" subtitle="Reviewing financial and personal details prior to loan release"  />
       <div className="space-y-6">
         <ComponentCard title="Application data">
-            {/* <PDIPage /> */}
-            <DataTE
-                    columns={columns}
-                    data={pdiData}
-                    itemsPerPage={10}
-                    enableSearch
-                    enableSelection
-                    actionBasePath="/dashboard/pdi"
-                    actionParams={["id"]}
-                  />
+            <PDIPage />
         </ComponentCard>
       </div>
     </div>

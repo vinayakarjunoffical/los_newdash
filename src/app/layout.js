@@ -3,6 +3,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { SidebarProvider } from "@/context/SidebarContext";
 import { Toaster } from "@/components/ui/sonner";
+import { ReduxProvider } from "@/components/atoms/ReduxProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,12 +26,14 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <ReduxProvider >
         <ThemeProvider>
           <SidebarProvider>
             {children}
             <Toaster richColors />
           </SidebarProvider>
         </ThemeProvider>
+        </ReduxProvider>
       </body>
     </html>
   );

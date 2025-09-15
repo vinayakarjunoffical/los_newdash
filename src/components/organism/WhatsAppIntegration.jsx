@@ -13,16 +13,14 @@ import { Switch } from "@/components/ui/switch";
 import { integrationConfigs } from "@/utils/access/integrationConfigs";
 
 export default function IntegrationForm() {
-  const { id } = useParams(); // dynamic route like /dashboard/[id]
-
-  console.log("sdfsdf form id",id)
+  const { id } = useParams(); 
   const config = integrationConfigs[id];
 
   if (!config) {
     return <p className="p-6 text-red-500">Invalid Integration ID</p>;
   }
 
-  // Build initial form state from config fields
+
   const initialFormState = config.fields.reduce((acc, field) => {
     acc[field.name] = "";
     return acc;
