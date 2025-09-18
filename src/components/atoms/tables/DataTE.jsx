@@ -138,7 +138,7 @@ export default function DataTE({
       </div>
 
       {/* 🔹 Table */}
-      <div className="max-w-full border rounded-lg px-5 py-2 overflow-x-auto scroll-smooth">
+      <div className="border rounded-lg px-5 py-2 overflow-x-auto scroll-smooth">
         <Table className="min-w-full table-auto">
           <TableHeader>
             <TableRow>
